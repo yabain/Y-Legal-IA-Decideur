@@ -30,4 +30,6 @@ class HTTPRestAPI:
 
     def run(self):
         app.run()
+        bussiness.startRabbimtMQ()
+
 

@@ -8,30 +8,36 @@ class RabbitMQClient():
         self.configService=config
         self.onDataCallback={}
         self.config={}
+        self.default_exchange="y_legal"
 
     def getConfiFromConfigService(self):
-        self.config.set("rabbitmq_server_host",self.configService.get("rabbitmq_server_host"))
-        self.config.set("rabbitmq_server_port",self.configService.get("rabbitmq_server_port"))
-        self.config.set("ia_decideur_default_queue_name",self.configService.get("ia_decideur_default_queue_name"))
+        self.config["rabbitmq_server_host"]=self.configService.get("rabbitmq_server_host")
+        self.config["rabbitmq_server_port"]=self.configService.get("rabbitmq_server_port")
+        self.config["ia_decideur_default_queue_name"]= self.configService.get("ia_decideur_default_queue_name")
 
     def connectoToServer(self):
         self.getConfiFromConfigService()
-
+        print(self.config)
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host=self.config.get("rabbitmq_server_host"),
-                port=self.config.get("rabbitmq_server_port"),
+                host=self.config["rabbitmq_server_host"],
+                port=self.config["rabbitmq_server_port"],
+                heartbeat=0,
             )
         )
         self.channel=self.connection.channel()
+
         self.channel.basic_qos(prefetch_count=1)
-        self.createNewQueue(queueName=self.config.get("ia_decideur_default_queue_name"),exchangeType="direct",routingQueueKey=self.config.get("ia_decideur_default_queue_name"))
-        self.channel.start_consuming()
+
+        self.createNewQueue(queueName=self.config["ia_decideur_default_queue_name"],exchangeName="y_legal",exchangeType="direct",routingQueueKey=self.config["ia_decideur_default_queue_name"])
 
         print("Successfull connected to rabbitmq server")
 
+    def startConsuming(self):
+        self.channel.start_consuming()
+
     def createNewQueue(self,queueName="",handleMessageFct=lambda body:print("Received message ",body),exchangeName="", exchangeType="fanout",routingQueueKey=""):
-        queue=self.channel.queue_declare(queue=queueName,durable=True,exclusive=True)
+        queue=self.channel.queue_declare(queue=queueName,durable=True,exclusive=True,auto_delete=False)
 
         ##bind between queue and exchange
         self.channel.exchange_declare(exchangeName,exchangeType)
@@ -41,8 +47,11 @@ class RabbitMQClient():
         self.channel.basic_consume(
             queue=queueName,
             on_message_callback=lambda ch, method, properties, body: self.onReceivedMessage(queueName,ch, method, properties, body,handleMessageFct),
-            auto_ack=True,
+            auto_ack=False
         )
+        self.channel.confirm_delivery()
+        #,
+
 
     def registerOnReceivedDataCallBack(self,queueName,callback):
         if self.onDataCallback.get(queueName) is None:
@@ -55,7 +64,7 @@ class RabbitMQClient():
             routing_key=routing_key,
             body=data,
             properties=pika.BasicProperties(
-                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
+                delivery_mode=1
             )
         )
 

@@ -9,5 +9,5 @@ class TextLoiClassifier:
         pass
 
     def predict(self,text):
-        self.model.predict(text)
+        #self.model.predict(text)
         return {"percent":1,"prediction":"yes"}

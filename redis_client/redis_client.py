@@ -1,4 +1,5 @@
 import sys
+import os
 
 import redis
 
@@ -11,8 +12,8 @@ class RedisClient:
     def connectToServer(self):
         try:
             self.connect = redis.Redis(
-                host="localhost",
-                port=6379,
+                host=os.getenv("REDIS_SERVEUR_HOST"),
+                port=os.getenv('REDIS_SERVEUR_PORT'),
                 decode_responses=True
             )
 

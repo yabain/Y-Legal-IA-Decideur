@@ -1,4 +1,4 @@
-pika
 flask
+pika
 pymupdf
 redis

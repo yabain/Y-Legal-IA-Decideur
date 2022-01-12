@@ -14,22 +14,35 @@ class BussinessClassifier:
         self.rabbitmq = RabbitMQClient(self.config)
 
         self.connectToServers()
+
         self.exchangename=self.config.get("ia_bussiness_get_posted_valid_document_queue_name")
         self.routingKey = self.config.get("ia_bussiness_get_posted_valid_document_routing_key")
 
+        print("end bussiness")
+
+
+    def startRabbimtMQ(self):
+        self.rabbitmq.startConsuming()
     def connectToServers(self):
         try:
-            self.config.connect()
-            self.rabbitmq.connection()
-        except Exception:
+            self.config.connectToServer()
+            print("end rabbit")
+
+            self.rabbitmq.connectoToServer()
+
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
             sys.exit(-1)
 
     def predict(self,text):
-        return self.classifier.predict(self.pretraitedText.removeReturnLine(text))
+        return self.classifier.predict(text)
 
     def predictFromTextStream(self,stream):
-        prediction= self.predict(readTextFromPDFDoc(readPDFFromStream(stream)))
+        text = self.pretraitedText.removeReturnLine(readTextFromPDFDoc(readPDFFromStream(stream)))
+        prediction= self.predict(text)
 
-        if prediction:
-            self.rabbitmq.sendMessage(self.exchangename,routing_key=self.routingKey,data=stream)
+        #if prediction:
+        #    self.rabbitmq.sendMessage(self.exchangename,routing_key=self.routingKey,data=stream)
+
+        self.rabbitmq.sendMessage('y_legal',self.config.get("indexeur_default_queue_name"),text)
         return prediction
