@@ -2,3 +2,4 @@ flask
 pika
 pymupdf
 redis
+retry

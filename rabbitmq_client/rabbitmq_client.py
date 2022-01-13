@@ -1,4 +1,5 @@
 import pika
+from retry import retry
 
 class RabbitMQClient():
     """Cette classe represente la classe rabbitmq client qui permet de faire la communication assynchrone"""
@@ -15,6 +16,7 @@ class RabbitMQClient():
         self.config["rabbitmq_server_port"]=self.configService.get("rabbitmq_server_port")
         self.config["ia_decideur_default_queue_name"]= self.configService.get("ia_decideur_default_queue_name")
 
+    @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
     def connectoToServer(self):
         self.getConfiFromConfigService()
         print(self.config)
