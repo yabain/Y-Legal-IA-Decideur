@@ -27,11 +27,12 @@ class BussinessClassifier:
         try:
             self.config.connectToServer()
             print("end rabbit")
-
+            self.rabbitmq.getConfiFromConfigService()
             self.rabbitmq.connectoToServer()
 
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
+            print(err)
             sys.exit(-1)
 
     def predict(self,text):

@@ -16,10 +16,9 @@ class RabbitMQClient():
         self.config["rabbitmq_server_port"]=self.configService.get("rabbitmq_server_port")
         self.config["ia_decideur_default_queue_name"]= self.configService.get("ia_decideur_default_queue_name")
 
-    @retry(pika.exceptions.AMQPConnectionError, delay=5, jitter=(1, 3))
+    @retry( delay=5, jitter=(1, 3))
     def connectoToServer(self):
-        self.getConfiFromConfigService()
-        print(self.config)
+        print('Try to connect to RabbitMQ Server')
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=self.config["rabbitmq_server_host"],
