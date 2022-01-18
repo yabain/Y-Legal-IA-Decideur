@@ -18,6 +18,8 @@ RUN git clone https://github.com/yabain/Y-Legal-IA-Decideur.git .
 
 RUN pip3 install -r requirements.txt
 
+EXPOSE 5000
+
 ENTRYPOINT ["python"]
 
 CMD ["main.py"]
