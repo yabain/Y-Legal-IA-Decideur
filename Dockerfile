@@ -1,9 +1,7 @@
-FROM python:3.8-slim-buster
+FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
 
 # install git
-RUN apt-get update -y && \
-    apt-get install -y python3-pip && \
-    apt-get install -y git
+RUN apk --update add bash nano git
 
 # add credentials on build
 #RUN mkdir /root/.ssh/
@@ -18,16 +16,16 @@ RUN git clone https://github.com/yabain/Y-Legal-IA-Decideur.git .
 
 RUN pip3 install -r requirements.txt
 
-ENV FLASK_APP=app.py
+ENV FLASK_APP=main.py
 
 ENV FLASK_DEBUG=0
 
 ENV FLASK_ENV=development
 
-EXPOSE 5000
+EXPOSE 80
 
-# ENTRYPOINT [ "flask" ]
+ENTRYPOINT [ "flask","run","--host=0.0.0.0" ]
 
 # CMD ["run", "--host=0.0.0.0"]
 
-CMD ["flask","run"]
+# ENTRYPOINT ["python3","app.py"]
