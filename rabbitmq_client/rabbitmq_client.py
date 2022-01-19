@@ -15,6 +15,7 @@ class RabbitMQClient():
         self.config["rabbitmq_server_host"]=self.configService.get("rabbitmq_server_host")
         self.config["rabbitmq_server_port"]=self.configService.get("rabbitmq_server_port")
         self.config["ia_decideur_default_queue_name"]= self.configService.get("ia_decideur_default_queue_name")
+        print(self.config)
 
     @retry( delay=5, jitter=(1, 3))
     def connectoToServer(self):
