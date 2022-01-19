@@ -18,6 +18,10 @@ RUN git clone https://github.com/yabain/Y-Legal-IA-Decideur.git .
 
 RUN pip3 install -r requirements.txt
 
+ENV FLASK_APP app
+
 EXPOSE 5000
 
-CMD ["python3", "app.py"]
+ENTRYPOINT [ "flask" ]
+
+CMD ["run" "--host=0.0.0.0"]
