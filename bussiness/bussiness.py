@@ -1,4 +1,5 @@
 import sys
+import base64
 
 from bussiness.classifier.text_lois_classifier import TextLoiClassifier
 from rabbitmq_client.rabbitmq_client import RabbitMQClient
@@ -38,11 +39,12 @@ class BussinessClassifier:
     def predict(self,text):
         return self.classifier.predict(text)
 
-    def predictFromTextStream(self,stream):
-        text = self.pretraitedText.removeReturnLine(readTextFromPDFDoc(readPDFFromStream(stream)))
+    def predictFromTextStream(self,fileObj):
+        textFromFile=fileObj.stream.read()
+        text = self.pretraitedText.removeReturnLine(readTextFromPDFDoc(readPDFFromStream(textFromFile)))
         prediction= self.predict(text)
 
-        #if prediction:
+        #if prediction:base64.b64encode(fileObj.read())
         #    self.rabbitmq.sendMessage(self.exchangename,routing_key=self.routingKey,data=stream)
 
         self.rabbitmq.sendMessage('y_legal',self.config.get("indexeur_default_queue_name"),text)

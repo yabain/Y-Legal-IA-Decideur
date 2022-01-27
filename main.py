@@ -25,7 +25,7 @@ def post():
         response.status_code = 400
         return response
     else:
-        prediction = bussiness.predictFromTextStream(file.stream.read())
+        prediction = bussiness.predictFromTextStream(file)
         response = jsonify({"message": "success", "code": 0, "prediction": {"prediction": prediction["prediction"],"percent": prediction["percent"]}})
         response.status_code = 200
         return response
